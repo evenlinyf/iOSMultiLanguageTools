@@ -1,6 +1,12 @@
 # iOSMultiLanguageTools
 This tool could help you do internationalization automate
 
+2022年03月02日
+- 去除pypinyin依赖
+- 以中文作为key
+- 支持swift
+
+
 如果你的项目已经迭代了不少版本了，这个时候突然有需求来说要做多语言支持。你搜索了下工程里面的汉字，然后就懵逼了，太多汉字写在代码里了！人肉搬运工？NO！
 
 下面的这个小工具可以帮你省下不少时间。
