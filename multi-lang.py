@@ -12,13 +12,14 @@ import sys
 import os
 import re
 import time
-from pypinyin import lazy_pinyin
+#from pypinyin import lazy_pinyin
 
 imp.reload(sys)
 sys.setdefaultencoding('utf-8')   # 设置默认编码
 
-validsuffixs = [".m"]
-validRex = ur'@\"[^\"]*[\u4E00-\u9FA5]+[^\"\n]*?\"'  # 查找 @"汉字"
+validsuffixs = [".m",".swift"]
+# validRex = ur'@\"[^\"]*[\u4E00-\u9FA5]+[^\"\n]*?\"' # 查找 @"汉字"
+validRex = ur'\"[^\"]*[\u4E00-\u9FA5]+[^\"\n]*?\"'  # 查找 "汉字"
 ignoreRex = [r"NSLocalizedString",
               r"MobClick",
               r"TalkingData",
@@ -29,14 +30,15 @@ ignoreRex = [r"NSLocalizedString",
               r"//",
               r"DEBUG_Log",
               r"DDLogDebug",
-              r"V4.0-"
+              r"V4.0-",
+              r"named"
               ]
 
 ignoreDir = [r"Pods",
               r"build",
               r"Carthage",
               r"3rdparty",
-              r"Util"
+              r"Util",
               ]
 
 ignoreDirSuffixs = [
@@ -46,7 +48,8 @@ ignoreDirSuffixs = [
 
 translatedRex = ur'=\s*\"[^\"]*[\u4E00-\u9FA5]+[^\"]*?\";'  # 用来解析.strings文件
 
-translateString = "RRUUNSLocalizedString(@\"%s\", %s)"
+translateString = "\"%s\".localValue"
+# translateString = "NSLocalizedString(@\"%s\", %s)"
 
 stringsFileName = 'Localizable.strings'
 translatedWords = {}  # 已翻译好的文字
@@ -133,12 +136,12 @@ def processfile(filepath):
                 needadd, word = findhanzi(line)
                 if needadd:
                     willProcessFils[filepath] = filepath
-                    word = word[2:-1]  # @"汉字" -> 汉字
+                    word = word[1:-1]  # @"汉字" -> 汉字
                     if translatedWords.get(word) is None and needTranslatedWords.get(word) is None:
                         # pypinyin转换中文为拼音
-                        needTranslatedWords[word] = '-'.join(lazy_pinyin(word))
+                        needTranslatedWords[word] = word
                         # needTranslatedWords 格式：{"汉字" : "hanzi"}
-
+                        print word
     finally:
         f.close()
 
@@ -155,11 +158,11 @@ def replacestringinfile(filepath):
             for line in lines:
                 needmodify, word = findhanzi(line)
                 if needmodify:
-                    key = word[2:-1]  # @"汉字" -> 汉字
+                    key = word[1:-1]  # @"汉字" -> 汉字
                     value = translatedWords.get(key)
                     if value is None:
                         value = needTranslatedWords.get(key)
-                    newstr = translateString % (value, word)
+                    newstr = translateString % (value)
                     line = line.replace(word, newstr)
                 file_data += line
 
